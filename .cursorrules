@@ -1,0 +1,77 @@
+## 语言与沟通
+- 默认用**中文**回复（除非用户明确要求英文）。
+- 输出要简洁、信息密度高；如果需要再展开说明。
+- 重要变更先给 1-2 句高层说明，再落到具体文件/代码。
+
+## 项目概览（monorepo）
+- 这是一个 `pnpm + turbo` 的前端 monorepo：
+  - 应用在 `apps/*`
+  - 共享包在 `packages/*`（例如：`packages/request`、`packages/ui`、`packages/theme`、`packages/typescript-config`、`packages/eslint-config`）
+- 修改代码时优先复用现有包能力，避免重复实现。
+
+## 命令与包管理
+- 一律优先使用 `pnpm`（不要用 `npm` / `yarn`），例如：
+  - `pnpm -w <cmd>`（workspace 根）
+  - `pnpm --filter <pkg> <cmd>`（指定包/应用）
+- 如需跑任务，优先使用 `turbo`（例如 `pnpm turbo run build --filter ...`），并尽量加上非交互参数。
+- 如需**初始化一个新的 app/脚手架项目**，优先使用**官方 CLI**（例如 Next.js：`pnpm create next-app@latest`）。
+  - 若不确定某技术栈/框架的官方推荐初始化方式，需先**联网查询官方文档**（以官方站点/仓库为准）确认推荐命令后再执行。
+
+## 路径与文件操作
+- 在讨论/工具参数中**优先使用绝对路径**（除非明确要求相对路径）。
+- 改动尽量小而集中；一次 PR/提交聚焦一个问题。
+- 新增文件时，放在最合理的包/应用目录，避免把业务代码塞进根目录。
+
+## TypeScript / 代码风格
+- 优先 TypeScript，避免 `any`；需要时用更精确的类型或泛型。
+- 遵循现有 ESLint/TSConfig 约束（各包内已有配置）。
+- 组件/工具函数尽量纯函数、可测试、可复用。
+
+## 运行与测试
+- **不要**擅自启动长期运行的本地服务（dev server）；除非用户明确要求。
+- 需要验证时优先：
+  - 运行对应包的 lint/typecheck/test
+  - 最小化手动验证步骤并清晰说明
+
+## 变更质量
+- 修改后如有 lints/type errors，优先在同一轮修复。
+- 影响范围大的改动要补充：原因、风险点、回滚方式（如适用）。
+
+## 版本策略（新仓库，优先最新稳定）
+- 这是新创建的仓库：优先选择**最新稳定版**（stable / LTS / current stable），避免引入已弃用/即将弃用方案，减少后期技术债。
+- 一旦发现依赖或 API 已标记 **deprecated**，优先按**官方文档**给出的迁移路径在同一轮完成替换（如可控）。
+- 新增依赖/框架/构建工具前：先确认其**官方推荐**的安装方式与当前稳定版本；避免使用非必要的实验特性（experimental/canary）除非用户明确要求。
+
+## 开发规范（默认约束）
+### 项目结构
+- `apps/*`：业务应用；`packages/*`：通用能力（请求、UI、主题、配置等）。
+- 业务逻辑优先放在对应 app 内；可复用能力优先沉淀到 `packages/*`，避免重复实现。
+- 文件命名与路由保持可读性：`kebab-case`（目录/路由），组件/类型 `PascalCase`，函数/变量 `camelCase`。
+
+### Next.js（App Router）约定
+- 优先使用 `app/` 路由（Server Components 默认），避免混用 Pages Router（除非明确需求）。
+- 路由与组件按职责拆分：`page.tsx` 仅做数据装配与布局，复杂 UI 拆到同目录 `components/`。
+- 导航使用 `next/link`，避免 `<a href>`（内部跳转）。
+- SSR 数据获取优先在 Server Component/Route Handler 中进行；需要 loading/错误边界时使用 `loading.tsx` / `error.tsx`。
+- 避免构建阶段依赖外网资源（如 Google Fonts 在线拉取）；需要字体请用可离线方案或明确说明。
+
+### 请求与数据层（统一用 @repo/request）
+- **服务端请求**（SSR/Route Handler/Node）：优先使用 `@repo/request/server` 的 `createServerClient`。
+- **客户端请求**（CSR）：优先使用 `@repo/request/client`（react-query）而不是手写 fetch。
+- 统一错误处理：优先返回/传递 `InternalResponse<T>`（`@repo/request/shared`），在边界层（page/route）再转成 UI/HTTP 响应。
+- 默认不要在业务里散落硬编码 baseURL；集中在 client 创建处或配置层。
+
+### TypeScript / 可维护性
+- 避免 `any`；优先用明确类型/泛型、`unknown` + 类型收窄。
+- 导出 API 要稳定、可预测；新增公共导出前先确认是否应放入 `packages/*`。
+- 复杂逻辑写成纯函数，尽量无副作用，便于复用与测试。
+
+### 依赖与锁文件
+- 避免手动编辑 `pnpm-lock.yaml`；如遇到 install/blocker，优先用“升级/修正依赖版本/overrides”方式解决，并解释原因与风险。
+
+### 文档与示例（packages/*）
+- 在 `packages/*` 下**新增或修改任何包**时，需同步更新该包的 `README.md`：
+  - 说明该包的定位、对外导出与使用边界（Server/Client/SSR 等）
+  - 提供至少 1 个可复制的 **demo 示例**（最小可运行或最小可验证用法）
+
+

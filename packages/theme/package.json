@@ -1,26 +1,28 @@
 {
-  "name": "@repo/ui",
+  "name": "@repo/theme",
   "version": "0.0.0",
   "private": true,
+  "sideEffects": false,
   "exports": {
-    "./*": "./src/*.tsx"
+    "./theme": "./theme.ts",
+    "./preset": "./preset.ts",
+    "./unocss": "./unocss.config.ts",
+    ".": "./index.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
-    "generate:component": "turbo gen react-component",
     "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "unocss": "^66.5.10"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.15.3",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
     "eslint": "^9.39.1",
     "typescript": "5.9.2"
-  },
-  "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
   }
 }
+
+

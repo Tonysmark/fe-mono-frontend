@@ -1,0 +1,26 @@
+{
+  "extends": "@repo/typescript-config/base.json",
+  "compilerOptions": {
+    "composite": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "isolatedModules": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "jsx": "react-jsx",
+    "types": ["node"]
+  },
+  "files": [
+    "src/server/index.ts",
+    "src/client/index.ts",
+    "src/shared/index.ts",
+    "src/shared/utils.ts",
+    "src/shared/types.ts"
+  ],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "examples"]
+}
+
+
